@@ -30,7 +30,7 @@ class _CameraUploadScreenState extends State<CameraUploadScreen> {
   bool isUploading = false;
 
   Future<void> _uploadImages() async {
-    final uri = Uri.parse("http://127.0.0.1:4321/upload-multicameraimages");
+    final uri = Uri.parse("http://192.168.1.5:4321/upload-multicameraimages");
     final request = http.MultipartRequest('POST', uri);
 
     List<int> indices = [];
@@ -343,10 +343,21 @@ class _CameraUploadScreenState extends State<CameraUploadScreen> {
                           onPressed: () {
                             _uploadImages();
                           },
-                          child: const Text(
-                            'Submit Images',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
+                          child: isUploading
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  'Submit Images',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.white),
+                                ),
                         ),
                       ),
                     ],

@@ -26,7 +26,7 @@ class _ViolationDetailsScreenState extends State<ViolationDetailsScreen> {
 
   Future<void> _fetchImages(int id) async {
     final url =
-        'http://127.0.0.1:4321/get-images/$id'; // Replace with your server URL
+        'http://192.168.1.5:4321/get-images/$id'; // Replace with your server URL
 
     try {
       final response = await http.get(Uri.parse(url));

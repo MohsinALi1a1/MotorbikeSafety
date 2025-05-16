@@ -5,7 +5,7 @@ import 'package:motorbikesafety/Model/Camera.dart';
 import 'package:motorbikesafety/Model/City.dart';
 
 class API {
-  static final String _baseurl = 'http://127.0.0.1:4321';
+  static final String _baseurl = 'http://192.168.1.5:4321';
 
   // City CRUD Operations   get, add ,delete
 
@@ -347,6 +347,63 @@ class API {
     }
   }
 
+  Future<http.Response> getAllNakaofNaka(int Nakaid) async {
+    String url = '$_baseurl/getnakadirectlink';
+
+    try {
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "FromNakaID": Nakaid,
+        }),
+      );
+      return response;
+    } catch (e) {
+      throw Exception('Error fetching Link Naka of Naka:  $e');
+    }
+  }
+
+  Future<http.Response> add_NakawithNaka(
+      int FromNakaID, ToNakaIDlist, distanceList) async {
+    String url = '$_baseurl/linkNakawithnaka';
+
+    try {
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "FromNakaID": FromNakaID,
+          "ToNakaID": ToNakaIDlist,
+          "DistanceKM": distanceList
+        }),
+      );
+      return response;
+    } catch (e) {
+      throw Exception('Error Linking  Naka with of Naka:  $e');
+    }
+  }
+
+  Future<bool> deleteLinknaka(int nakaid, int tonaka) async {
+    String url = '$_baseurl/deletelinknaka';
+    try {
+      var response = await http.delete(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: json
+            .encode({'id': nakaid, 'tonakaid': tonaka}), // Send the Place data
+      );
+
+      if (response.statusCode == 200) {
+        return true; // Success
+      } else {
+        return false; // Failed to add city
+      }
+    } catch (e) {
+      throw Exception('Error Deleting Link Naka: $e');
+    }
+  }
+
   // Crud Operations on Shifts get , add, delete
   Future<http.Response> getAllShifts() async {
     String url =
@@ -457,7 +514,7 @@ class API {
         }), // Send the city data
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
         return true; // Success
       } else {
         return false; // Failed to add city

@@ -28,11 +28,18 @@ class _updateviolationState extends State<UpdateViolation> {
 
   late TextEditingController _finecontroller;
   late TextEditingController _descriptioncontroller;
-
+  bool isAllRidersRequired = false;
   @override
   void initState() {
     super.initState();
-    _isChecked = widget.violationrule.limitValue != -1 ? true : false;
+    isAllRidersRequired = widget.violationrule.name == "Helmet" &&
+            widget.violationrule.limitValue != -1
+        ? true
+        : false;
+    _isChecked = widget.violationrule.name == "OverRiding" &&
+            widget.violationrule.limitValue != -1
+        ? true
+        : false;
     _namecontroller = TextEditingController(text: widget.violationrule.name);
     _limitcontroller = TextEditingController(
         text: widget.violationrule.limitValue != -1
@@ -60,25 +67,39 @@ class _updateviolationState extends State<UpdateViolation> {
       return;
     }
 
-    if (_isChecked) {
+    if (_isChecked && !isAllRidersRequired) {
       if (startselectedDateTime == null ||
           endselectedDateTime == null ||
           _limitcontroller.text.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(
-                  'Please select both Start and End date/time and Enter Limit')),
+            content: Text(
+              'Please select both Start and End date/time and enter Limit',
+            ),
+          ),
         );
         return;
       }
       startdate = startselectedDateTime;
       enddate = endselectedDateTime;
       limit = int.tryParse(_limitcontroller.text);
-    } else {
+    } else if (!_isChecked && !isAllRidersRequired) {
+      // Case when checkbox is not checked and all riders not required
       limit = -1;
       startdate = null;
       enddate = null;
+    } else if (isAllRidersRequired && !_isChecked) {
+      if (_limitcontroller.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Limit value is required')),
+        );
+        return;
+      }
+      limit = int.tryParse(_limitcontroller.text);
+      startdate = null;
+      enddate = null;
     }
+
     setState(() {
       _isLoading = true;
     });
@@ -368,192 +389,176 @@ class _updateviolationState extends State<UpdateViolation> {
               ),
             ),
             const SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Checkbox(
-                  value: _isChecked,
-                  activeColor: Colors.blue, // Checkbox color when checked
-                  checkColor: Colors.white, // Tick mark color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5), // Rounded corners
-                  ),
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _isChecked = value ?? false;
-                    });
-                  },
-                ),
-                Text(
-                  "Do You want to Set Limit?",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-            _isChecked
+            _namecontroller.text == "OverRiding"
                 ? Column(children: [
-                    TextField(
-                      keyboardType: TextInputType.number, // Number keypad
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly
-                      ], // Restricts input to digits only
-                      controller: _limitcontroller,
-                      decoration: InputDecoration(
-                        labelText: 'Enter Limit ',
-                        labelStyle: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                          fontSize: 16,
-                        ),
-                        hintText: 'Enter the Limit ',
-                        hintStyle: TextStyle(
-                          color: Colors.grey.shade500,
-                        ),
-                        prefixIcon:
-                            Icon(Icons.rule, color: Colors.teal, size: 18),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.teal,
-                            width: 1.5,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.teal, // Unfocused border color
-                            width: 1.5,
-                          ),
-                        ),
-                        // The border when the TextFormField is focused
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: Colors.teal, // Focused border color
-                            width: 2.0, // Thicker border when focused
-                          ),
-                        ),
+                    SwitchListTile(
+                      title: Text(
+                        _isChecked
+                            ? "Current sitting limit is 2. Turn off to allow 1 person only."
+                            : "Current sitting limit is 1. Turn on to allow 2 persons.",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
                       ),
+                      value: _isChecked,
+                      onChanged: (bool value) {
+                        setState(() {
+                          _isChecked = value;
+                          if (_isChecked) {
+                            _limitcontroller.text = "1";
+                          } else {
+                            _limitcontroller.text = "-1";
+                          }
+                        });
+                      },
+                      activeColor: Colors.green,
+                      inactiveThumbColor: Colors.red,
                     ),
                     SizedBox(
                       height: 10,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        GestureDetector(
-                          onTap: () async {
-                            DateTime? picked = await selectDateTime(context);
-                            if (picked != null) {
-                              setState(() {
-                                startselectedDateTime = picked;
-                              });
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.teal),
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.white,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(Icons.calendar_today,
-                                    color: Colors.teal, size: 28),
-                                SizedBox(height: 12),
-                                if (startselectedDateTime != null) ...[
-                                  Text(
-                                    "Selected Date & Time",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: Colors.black87,
-                                    ),
+                    _isChecked
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              GestureDetector(
+                                onTap: () async {
+                                  DateTime? picked =
+                                      await selectDateTime(context);
+                                  if (picked != null) {
+                                    setState(() {
+                                      startselectedDateTime = picked;
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.teal),
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: Colors.white,
                                   ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "${startselectedDateTime!.day}-${startselectedDateTime!.month}-${startselectedDateTime!.year}",
-                                    style: TextStyle(fontSize: 16),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.calendar_today,
+                                          color: Colors.teal, size: 28),
+                                      SizedBox(height: 12),
+                                      if (startselectedDateTime != null) ...[
+                                        Text(
+                                          "Selected Date & Time",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          "${startselectedDateTime!.day}-${startselectedDateTime!.month}-${startselectedDateTime!.year}",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        Text(
+                                          "${startselectedDateTime!.hour.toString().padLeft(2, '0')}:${startselectedDateTime!.minute.toString().padLeft(2, '0')}",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ] else ...[
+                                        Text(
+                                          "Tap to select Date & Time",
+                                          style: TextStyle(
+                                              fontSize: 12, color: Colors.grey),
+                                        ),
+                                      ]
+                                    ],
                                   ),
-                                  Text(
-                                    "${startselectedDateTime!.hour.toString().padLeft(2, '0')}:${startselectedDateTime!.minute.toString().padLeft(2, '0')}",
-                                    style: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  DateTime? picked =
+                                      await selectDateTime(context);
+                                  if (picked != null) {
+                                    setState(() {
+                                      endselectedDateTime = picked;
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.teal),
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: Colors.white,
                                   ),
-                                ] else ...[
-                                  Text(
-                                    "Tap to select Date & Time",
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.calendar_today,
+                                          color: Colors.teal, size: 28),
+                                      SizedBox(height: 12),
+                                      if (endselectedDateTime != null) ...[
+                                        Text(
+                                          "Selected Date & Time",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          "${endselectedDateTime!.day}-${endselectedDateTime!.month}-${endselectedDateTime!.year}",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        Text(
+                                          "${endselectedDateTime!.hour.toString().padLeft(2, '0')}:${endselectedDateTime!.minute.toString().padLeft(2, '0')}",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ] else ...[
+                                        Text(
+                                          "Tap to select Date & Time",
+                                          style: TextStyle(
+                                              fontSize: 12, color: Colors.grey),
+                                        ),
+                                      ]
+                                    ],
                                   ),
-                                ]
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            DateTime? picked = await selectDateTime(context);
-                            if (picked != null) {
-                              setState(() {
-                                endselectedDateTime = picked;
-                              });
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.teal),
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.white,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(Icons.calendar_today,
-                                    color: Colors.teal, size: 28),
-                                SizedBox(height: 12),
-                                if (endselectedDateTime != null) ...[
-                                  Text(
-                                    "Selected Date & Time",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "${endselectedDateTime!.day}-${endselectedDateTime!.month}-${endselectedDateTime!.year}",
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                  Text(
-                                    "${endselectedDateTime!.hour.toString().padLeft(2, '0')}:${endselectedDateTime!.minute.toString().padLeft(2, '0')}",
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                                ] else ...[
-                                  Text(
-                                    "Tap to select Date & Time",
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
-                                  ),
-                                ]
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                                ),
+                              ),
+                            ],
+                          )
+                        : SizedBox(),
                   ])
                 : SizedBox(),
+            _namecontroller.text == "Helmet"
+                ? SwitchListTile(
+                    title: Text(
+                      isAllRidersRequired
+                          ? "All persons on bike must wear helmet. Turn off to make it only rider."
+                          : "Only rider must wear helmet. Turn on to require all persons on bike to wear helmet.",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    value: isAllRidersRequired,
+                    onChanged: (bool value) {
+                      setState(() {
+                        isAllRidersRequired = value;
+                        if (isAllRidersRequired) {
+                          _limitcontroller.text = "1";
+                        } else {
+                          _limitcontroller.text = "-1";
+                        }
+                      });
+                    },
+                    activeColor: Colors.green,
+                    inactiveThumbColor: Colors.red,
+                  )
+                : SizedBox(),
+
             const SizedBox(height: 10),
 
             // Save Button

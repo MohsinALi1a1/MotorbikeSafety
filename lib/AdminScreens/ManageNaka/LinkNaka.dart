@@ -1,32 +1,39 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:motorbikesafety/AdminScreens/ManageNaka/LinkCameraHome.dart';
 import 'package:motorbikesafety/AdminScreens/ManageNaka/LinkNakaHome.dart';
-import 'package:motorbikesafety/AdminScreens/ManageNaka/addnaka.dart';
+
+import 'package:motorbikesafety/Model/Camera.dart';
 import 'package:motorbikesafety/Model/City.dart';
 import 'package:motorbikesafety/Model/Direction.dart';
+import 'package:motorbikesafety/Model/LinkNaka.dart';
 import 'package:motorbikesafety/Model/Naka.dart';
 import 'package:motorbikesafety/Model/Place.dart';
-import 'package:motorbikesafety/AdminScreens/ManageDirection/Adddirection.dart';
 import 'package:motorbikesafety/Service/ApiHandle.dart';
 
-class NakaDetailScreen extends StatefulWidget {
-  const NakaDetailScreen({super.key});
+class LinkNaka extends StatefulWidget {
+  final Naka naka;
+  final List<Linknaka> selectednaka;
+
+  LinkNaka({Key? key, required this.naka, required this.selectednaka})
+      : super(key: key);
 
   @override
-  State<NakaDetailScreen> createState() => _NakaDetailScreenState();
+  _LinkNakaState createState() => _LinkNakaState();
 }
 
-class _NakaDetailScreenState extends State<NakaDetailScreen> {
+class _LinkNakaState extends State<LinkNaka> {
+  final GlobalKey<ScaffoldMessengerState> _scaffoldKey =
+      GlobalKey<ScaffoldMessengerState>();
   API api = API();
   bool _isLoading = false;
   List<Place> placeList = [];
   List<City> cityList = [];
   List<Naka> nakaList = [];
+  List<Naka> unselectednaka = [];
   String? selectedCity;
   String? selectedPlace;
+  List<int> selectedNakaid = [];
 
   Future<void> _getplaces(String name) async {
     if (name.isEmpty) {
@@ -93,6 +100,13 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
       if (response.statusCode == 200) {
         List<dynamic> nakamap = json.decode(response.body);
         nakaList = nakamap.map((e) => Naka.fromMap(e)).toList();
+        unselectednaka = nakaList.where((naka) {
+          return !widget.selectednaka.any((selected) => selected.id == naka.id);
+        }).toList();
+
+        unselectednaka = unselectednaka.where((naka) {
+          return naka.id != widget.naka.id;
+        }).toList();
 
         // ScaffoldMessenger.of(context).showSnackBar(
         //   SnackBar(content: Text('Naka fetched successfully')),
@@ -194,6 +208,42 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
     }
   }
 
+  Future<bool> _Linknakawithnaka() async {
+    if (selectedNakaid.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please Select Naka to Link with This Naka')),
+      );
+      return false;
+    }
+
+    try {
+      List<int> zeroDistances = List.filled(selectedNakaid.length, 0);
+
+      // Get the full HTTP response from the API
+      var response = await api.add_NakawithNaka(
+          widget.naka.id!, selectedNakaid, zeroDistances);
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Naka Link successfully')),
+        );
+        return true;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to Link Naka: ${response.body}')),
+        );
+        return false;
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+      return false;
+    } finally {
+      setState(() {});
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -203,6 +253,7 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey, // Attach the global key
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(120),
         child: AppBar(
@@ -224,7 +275,6 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: Stack(
                 children: [
-                  // Back Arrow Button
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
@@ -247,18 +297,17 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
                           size: 30,
                         ),
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context, widget.selectednaka);
                         },
                       ),
                     ),
                   ),
-
                   Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
-                          "Naka",
+                          "Link Naka",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 25,
@@ -268,7 +317,7 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          "Set up and manage Naka ",
+                          "Link Naka with Naka",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.grey[200],
@@ -284,32 +333,31 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
             ),
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.teal,
-        onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddNaka()),
-          );
-          setState(() {
-            _getNaka(selectedPlace!);
-          });
-        },
-        child: const Text(
-          '+',
-          style: TextStyle(
-            fontSize: 30,
-            color: Colors.white,
-          ),
-        ),
-      ),
+      ), // Display Chowki Name at the Top
+
       body: Stack(
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
               children: [
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.teal),
+                  ),
+                  child: Text(
+                    "Chowki: ${widget.naka.name}",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black54),
+                  ),
+                ),
+                SizedBox(height: 10),
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
@@ -411,16 +459,15 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
                 ),
                 // Display the list of places
                 Expanded(
-                    child: nakaList.length > 0
+                    child: unselectednaka.length > 0
                         ? ListView.builder(
-                            itemCount: nakaList.length,
+                            itemCount: unselectednaka.length,
                             itemBuilder: (context, index) {
-                              Naka naka = nakaList[index];
+                              Naka naka = unselectednaka[index];
                               return Card(
                                 margin: const EdgeInsets.all(8.0),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                      12), // Rounded corners for card
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 elevation: 5,
                                 child: Padding(
@@ -440,121 +487,38 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
                                             Text(
                                               'Naka ID: ${naka.id}',
                                               style: TextStyle(
-                                                fontSize:
-                                                    15, // Reduced font size
-                                                fontWeight: FontWeight
-                                                    .bold, // Slightly lighter for style
-                                                color: Colors.teal
-                                                    .shade700, // More vibrant color for text
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.teal.shade700,
                                               ),
                                             ),
-                                            SizedBox(
-                                                height:
-                                                    4), // Reduced space between text lines
+                                            SizedBox(height: 4),
                                             Text(
                                               'Naka Name: ${naka.name}',
                                               style: TextStyle(
-                                                fontSize:
-                                                    15, // Adjusted font size for readability
-                                                fontWeight: FontWeight
-                                                    .w600, // Slightly lighter than bold
-                                                color: Colors
-                                                    .black87, // Darker shade for better contrast
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.black87,
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
-                                      IconButton(
-                                        onPressed: () async {
-                                          await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  LinkNakaHome(
-                                                naka: naka,
-                                              ),
-                                            ),
-                                          );
+                                      Checkbox(
+                                        value: selectedNakaid.any(
+                                            (selected) => selected == naka.id),
+                                        onChanged: (bool? value) {
+                                          setState(() {
+                                            if (value == true) {
+                                              selectedNakaid.add(naka.id!);
+                                            } else {
+                                              selectedNakaid.removeWhere(
+                                                  (selected) =>
+                                                      selected == naka.id);
+                                            }
+                                          });
                                         },
-                                        icon: Icon(
-                                          Icons
-                                              .local_police, // This icon represents a location, similar to Naka or Chowki
-                                          color: Colors.teal,
-                                        ),
-                                      ),
-                                      IconButton(
-                                          onPressed: () async {
-                                            await Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      LinkCameraHome(
-                                                        naka: naka,
-                                                      )),
-                                            );
-                                          },
-                                          icon: Icon(Icons.camera_alt_outlined,
-                                              color: Colors.teal)),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete,
-                                            color: Colors.teal),
-                                        onPressed: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: const Text(
-                                                  "Delete Naka",
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                content: const Text(
-                                                  "Are you sure you want to Delete this Naka?",
-                                                  style:
-                                                      TextStyle(fontSize: 16),
-                                                ),
-                                                actions: [
-                                                  // Cancel Button
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: const Text(
-                                                      "Cancel",
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.grey,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  // Delete Button
-                                                  TextButton(
-                                                    onPressed: () async {
-                                                      await _deletenaka(
-                                                          naka.name,
-                                                          selectedPlace!);
-                                                      setState(() {
-                                                        _getNaka(
-                                                            selectedPlace!);
-                                                      });
-
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: const Text(
-                                                      "Delete",
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.red,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                            },
-                                          );
-                                        },
+                                        activeColor: Colors.teal,
                                       ),
                                     ],
                                   ),
@@ -565,6 +529,33 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
                         : Center(
                             child: Text('No Naka Found'),
                           )),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      minimumSize: const Size.fromHeight(50),
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(8), // 👈 Slight curve
+                      ),
+                    ),
+                    onPressed: () async {
+                      bool success = await _Linknakawithnaka();
+                      if (success) {
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 16,
+                ),
               ],
             ),
           ),

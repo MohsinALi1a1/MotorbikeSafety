@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:motorbikesafety/Service/ApiHandle.dart';
-import 'package:intl/intl.dart';
 
 class NewShift extends StatefulWidget {
   const NewShift({super.key});
@@ -16,6 +15,16 @@ class _NewShiftState extends State<NewShift> {
   String? selectedstartShift;
   String? selectedendShift;
 
+  final List<String> shiftstartTimings = [
+    "08:00:00",
+    "16:00:00",
+    "00:00:00",
+  ];
+  final List<String> shiftendTimings = [
+    "16:00:00",
+    "00:00:00",
+    "08:00:00",
+  ];
   Future<void> _addshifts() async {
     if (selectedValue.isEmpty ||
         selectedstartShift == null ||
@@ -217,8 +226,6 @@ class _NewShiftState extends State<NewShift> {
               height: 10,
             ),
             Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.teal, width: 1.5),
@@ -231,44 +238,42 @@ class _NewShiftState extends State<NewShift> {
                   ),
                 ],
               ),
-              child: InkWell(
-                onTap: () async {
-                  TimeOfDay? pickedTime = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  if (pickedTime != null) {
-                    final now = DateTime.now();
-                    final dt = DateTime(now.year, now.month, now.day,
-                        pickedTime.hour, pickedTime.minute);
-                    setState(() {
-                      selectedstartShift = DateFormat('HH:mm:ss').format(dt);
-                    });
-                  }
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+              child: DropdownButtonFormField<String>(
+                value: selectedstartShift,
+                decoration: InputDecoration(
+                  labelText: "Starting Time",
+                  labelStyle: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  border: InputBorder.none, // Removes the default border
+                ),
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedstartShift = newValue;
+                  });
                 },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      selectedstartShift ?? 'Select Start Time',
+                isExpanded: true,
+                icon: Icon(Icons.arrow_drop_down, color: Colors.teal),
+                items: shiftstartTimings.map((shift) {
+                  return DropdownMenuItem<String>(
+                    value: shift,
+                    child: Text(
+                      shift,
                       style: TextStyle(
-                        color: selectedstartShift == null
-                            ? Colors.grey
-                            : Colors.black,
+                        color: Colors.black,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Icon(Icons.access_time, color: Colors.teal),
-                  ],
-                ),
+                  );
+                }).toList(),
               ),
             ),
             const SizedBox(
               height: 10,
             ),
             Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.teal, width: 1.5),
@@ -281,36 +286,36 @@ class _NewShiftState extends State<NewShift> {
                   ),
                 ],
               ),
-              child: InkWell(
-                onTap: () async {
-                  TimeOfDay? pickedTime = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-                  if (pickedTime != null) {
-                    final now = DateTime.now();
-                    final dt = DateTime(now.year, now.month, now.day,
-                        pickedTime.hour, pickedTime.minute);
-                    setState(() {
-                      selectedendShift = DateFormat('HH:mm:ss').format(dt);
-                    });
-                  }
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+              child: DropdownButtonFormField<String>(
+                value: selectedendShift,
+                decoration: InputDecoration(
+                  labelText: "End Time",
+                  labelStyle: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  border: InputBorder.none, // Removes the default border
+                ),
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedendShift = newValue;
+                  });
                 },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      selectedendShift ?? 'Select End Time',
+                isExpanded: true,
+                icon: Icon(Icons.arrow_drop_down, color: Colors.teal),
+                items: shiftendTimings.map((shift) {
+                  return DropdownMenuItem<String>(
+                    value: shift,
+                    child: Text(
+                      shift,
                       style: TextStyle(
-                        color: selectedendShift == null
-                            ? Colors.grey
-                            : Colors.black,
+                        color: Colors.black,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Icon(Icons.access_time, color: Colors.teal),
-                  ],
-                ),
+                  );
+                }).toList(),
               ),
             ),
             const SizedBox(

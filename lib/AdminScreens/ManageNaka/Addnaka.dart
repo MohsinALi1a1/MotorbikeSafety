@@ -19,7 +19,6 @@ class _AddNakaState extends State<AddNaka> {
   String? selectedCity;
   String? selectedPlace;
 
-  bool _isLoading = false;
   API api = API();
   List<City> cityList = [];
   List<Place> placeList = [];
@@ -39,9 +38,7 @@ class _AddNakaState extends State<AddNaka> {
   }
 
   Future<void> _getCities() async {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
 
     try {
       var response = await api.getAllCities();
@@ -75,9 +72,7 @@ class _AddNakaState extends State<AddNaka> {
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() {});
     }
   }
 
@@ -89,9 +84,7 @@ class _AddNakaState extends State<AddNaka> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
 
     try {
       var response = await api.getAllplaces(name);
@@ -125,9 +118,7 @@ class _AddNakaState extends State<AddNaka> {
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() {});
     }
   }
 
@@ -139,9 +130,7 @@ class _AddNakaState extends State<AddNaka> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
 
     try {
       var response = await api.getAllDirection(name);
@@ -171,9 +160,7 @@ class _AddNakaState extends State<AddNaka> {
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() {});
     }
   }
 
@@ -185,9 +172,7 @@ class _AddNakaState extends State<AddNaka> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
 
     try {
       // Call the API method to save the city
@@ -210,9 +195,7 @@ class _AddNakaState extends State<AddNaka> {
         SnackBar(content: Text('Error: $e')),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() {});
     }
   }
 

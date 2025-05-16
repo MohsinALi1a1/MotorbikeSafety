@@ -143,7 +143,7 @@ class _Wardenhome_pageState extends State<Wardenhome_page> {
   void initState() {
     super.initState();
     _getwardensdutyrosterbyid(widget.id);
-    // fetchNotifications();
+    fetchNotifications();
     startFetchingNotifications();
   }
 

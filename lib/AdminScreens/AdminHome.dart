@@ -336,12 +336,16 @@ class _Adminhome_pageState extends State<Adminhome_page> {
                     backgroundColor: Colors.teal,
                     minimumSize: const Size.fromHeight(50),
                     elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8), // 👈 Slight curve
+                    ),
                   ),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const ViolationsDetailScreen()),
+                        builder: (context) => const ViolationsDetailScreen(),
+                      ),
                     );
                   },
                   child: const Text(
