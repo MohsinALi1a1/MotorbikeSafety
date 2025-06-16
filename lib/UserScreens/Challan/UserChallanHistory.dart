@@ -5,35 +5,37 @@ import 'package:motorbikesafety/Model/Challan.dart';
 import 'package:motorbikesafety/Model/Vehicle.dart';
 import 'package:motorbikesafety/Model/ViolationHistory.dart';
 import 'package:motorbikesafety/Service/ApiHandle.dart';
+import 'package:motorbikesafety/UserScreens/Challan/UserChallanDetailScreen.dart';
 import 'package:motorbikesafety/WardenScreens/Challan/ChallanDetailScreen.dart';
 import 'package:motorbikesafety/WardenScreens/Challan/CreateChallanScreen.dart';
 import 'package:motorbikesafety/WardenScreens/Violations/ViolationDetailsScreen.dart';
 
-class ChallanHistoryScreen extends StatefulWidget {
+class UserChallanHistoryScreen extends StatefulWidget {
   // final int naka_id;
-  final int warden_id;
+  final int user_cnic;
 
-  const ChallanHistoryScreen(
+  const UserChallanHistoryScreen(
       // {Key? key, required this.naka_id, required this.warden_id})
       // : super(key: key);
       {super.key,
-      required this.warden_id});
+      required this.user_cnic});
   @override
-  State<ChallanHistoryScreen> createState() => _ChallanHistoryScreenState();
+  State<UserChallanHistoryScreen> createState() =>
+      _ChallanUSerHistoryScreenState();
 }
 
-class _ChallanHistoryScreenState extends State<ChallanHistoryScreen> {
+class _ChallanUSerHistoryScreenState extends State<UserChallanHistoryScreen> {
   API api = API();
   bool _isLoading = false;
   List<Challan> challanlist = [];
 
-  Future<void> _getChallansByWardenId(int id) async {
+  Future<void> _getChallansByuserCnic(int cnic) async {
     setState(() {
       _isLoading = true;
     });
 
     try {
-      var response = await api.getchallanhistorybywardenid(id);
+      var response = await api.getchallanhistorybyuserid(cnic);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -73,7 +75,7 @@ class _ChallanHistoryScreenState extends State<ChallanHistoryScreen> {
   void initState() {
     super.initState();
 
-    _getChallansByWardenId(widget.warden_id);
+    _getChallansByuserCnic(widget.user_cnic);
   }
 
   @override
@@ -441,7 +443,7 @@ class ChallanCard extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ChallanDetailsScreen(
+                          builder: (context) => ChallanDetailsScreenforuser(
                             challanhistory: challan,
                             wardenid: challan.wardenId,
                           ),

@@ -10,7 +10,7 @@ import 'package:motorbikesafety/Service/ApiHandle.dart';
 class LinkCameraHome extends StatefulWidget {
   final Naka naka;
 
-  const LinkCameraHome({Key? key, required this.naka}) : super(key: key);
+  const LinkCameraHome({super.key, required this.naka});
 
   @override
   _LinkCameraHomeState createState() => _LinkCameraHomeState();

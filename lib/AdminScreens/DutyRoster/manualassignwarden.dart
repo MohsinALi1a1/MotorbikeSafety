@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class manualAssignment extends StatefulWidget {
+  const manualAssignment({super.key});
+
   @override
   _manualAssignmentState createState() => _manualAssignmentState();
 }

@@ -12,7 +12,7 @@ import 'package:motorbikesafety/Service/ApiHandle.dart';
 class LinkNakaHome extends StatefulWidget {
   final Naka naka;
 
-  const LinkNakaHome({Key? key, required this.naka}) : super(key: key);
+  const LinkNakaHome({super.key, required this.naka});
 
   @override
   _LinkNakaHomeState createState() => _LinkNakaHomeState();
@@ -32,7 +32,7 @@ class _LinkNakaHomeState extends State<LinkNakaHome> {
   }
 
   Future<void> _deleteLinknaka(int nakaid, int linknaka) async {
-    if (nakaid == null || linknaka == null) {
+    if (linknaka == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please Pass a Link Naka id and Link Naka')),
       );
@@ -68,11 +68,6 @@ class _LinkNakaHomeState extends State<LinkNakaHome> {
   }
 
   Future<void> _getnaka(int nakaid) async {
-    if (nakaid == null) {
-      _showSnackbar('Please pass a valid Naka ID');
-      return;
-    }
-
     setState(() {
       _isLoading = true;
     });

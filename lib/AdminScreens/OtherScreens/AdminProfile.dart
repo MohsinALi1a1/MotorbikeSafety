@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:motorbikesafety/AdminScreens/OtherScreens/AdminEditProfilePage.dart';
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
@@ -14,7 +16,7 @@ class _ProfilePageState extends State<ProfilePage> {
     "email": "ali.khan@example.com",
     "mobile_number": "+92 321 9876543",
     "city": "Islamabad",
-    "image_url": "assets\logo.png", // Replace with actual image path
+    "image_url": "assetslogo.png", // Replace with actual image path
   };
 
   @override

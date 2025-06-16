@@ -7,8 +7,7 @@ import 'package:motorbikesafety/AdminScreens/OtherScreens/AdminSetting.dart';
 class AdminMain extends StatefulWidget {
   final int id; // Accepts the ID
 
-  const AdminMain({Key? key, required this.id})
-      : super(key: key); // Updated constructor
+  const AdminMain({super.key, required this.id}); // Updated constructor
 
   @override
   _AdminMainState createState() => _AdminMainState();

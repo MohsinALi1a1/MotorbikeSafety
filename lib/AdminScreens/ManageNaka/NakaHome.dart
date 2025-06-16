@@ -411,7 +411,7 @@ class _NakaDetailScreenState extends State<NakaDetailScreen> {
                 ),
                 // Display the list of places
                 Expanded(
-                    child: nakaList.length > 0
+                    child: nakaList.isNotEmpty
                         ? ListView.builder(
                             itemCount: nakaList.length,
                             itemBuilder: (context, index) {

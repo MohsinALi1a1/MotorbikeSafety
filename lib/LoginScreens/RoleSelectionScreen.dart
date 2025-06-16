@@ -3,6 +3,8 @@ import 'package:motorbikesafety/LoginScreens/Userlogin.dart';
 import 'package:motorbikesafety/LoginScreens/Wardenlogin.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
+  const RoleSelectionScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

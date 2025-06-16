@@ -223,7 +223,7 @@ class _ShiftsState extends State<Shifts> {
           _isLoading
               ? Expanded(child: Center(child: CircularProgressIndicator()))
               : Expanded(
-                  child: shiftlist.length > 0
+                  child: shiftlist.isNotEmpty
                       ? ListView.builder(
                           itemCount: shiftlist.length,
                           itemBuilder: (context, index) {

@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 class NotificationDetailPage extends StatelessWidget {
   final Map<String, dynamic> notification;
 
-  NotificationDetailPage({required this.notification});
+  const NotificationDetailPage({super.key, required this.notification});
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +36,7 @@ class NotificationDetailPage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Text(
-              "Received: " +
-                  DateFormat('MMM dd, hh:mm a').format(notification["time"]),
+              "Received: ${DateFormat('MMM dd, hh:mm a').format(notification["time"])}",
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
           ],

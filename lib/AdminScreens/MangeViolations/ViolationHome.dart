@@ -1,11 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:motorbikesafety/AdminScreens/MangeViolations/addviolation.dart';
 import 'package:motorbikesafety/AdminScreens/MangeViolations/updateviolation.dart';
-import 'package:motorbikesafety/Model/City.dart';
-import 'package:motorbikesafety/AdminScreens/ManageCity/AddCity.dart';
 import 'package:motorbikesafety/Model/Violation.dart';
 import 'package:motorbikesafety/Service/ApiHandle.dart';
 

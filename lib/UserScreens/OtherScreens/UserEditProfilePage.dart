@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-class EditAdminProfilePage extends StatefulWidget {
+class EditUserProfilePage extends StatefulWidget {
   final Map<String, String> wardenDetails;
 
-  const EditAdminProfilePage({super.key, required this.wardenDetails});
+  const EditUserProfilePage({super.key, required this.wardenDetails});
 
   @override
-  _EditAdminProfilePageState createState() => _EditAdminProfilePageState();
+  _EditUserProfilePageState createState() => _EditUserProfilePageState();
 }
 
-class _EditAdminProfilePageState extends State<EditAdminProfilePage> {
+class _EditUserProfilePageState extends State<EditUserProfilePage> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController nameController;
   late TextEditingController badgeController;

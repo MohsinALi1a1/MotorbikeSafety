@@ -407,7 +407,7 @@ class _DirectionDetailScreenState extends State<DirectionDetailScreen> {
                 ),
                 // Display the list of places
                 Expanded(
-                    child: directionList.length > 0
+                    child: directionList.isNotEmpty
                         ? ListView.builder(
                             itemCount: directionList.length,
                             itemBuilder: (context, index) {

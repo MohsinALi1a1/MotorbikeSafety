@@ -4,13 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:motorbikesafety/Model/ViolationHistory.dart';
 import 'package:motorbikesafety/Model/ViolationImage.dart';
+import 'package:motorbikesafety/Service/ApiHandle.dart';
 import 'package:motorbikesafety/WardenScreens/Challan/CreateChallanScreen.dart';
 
 class ViolationDetailsScreen extends StatefulWidget {
   final ViolationHistory violationhistory;
   final int wardenid;
+  final int nakaid;
   const ViolationDetailsScreen(
-      {super.key, required this.violationhistory, required this.wardenid});
+      {super.key,
+      required this.violationhistory,
+      required this.wardenid,
+      required this.nakaid});
 
   @override
   State<ViolationDetailsScreen> createState() => _ViolationDetailsScreenState();
@@ -18,15 +23,71 @@ class ViolationDetailsScreen extends StatefulWidget {
 
 class _ViolationDetailsScreenState extends State<ViolationDetailsScreen> {
   List<ViolationImage> imageData_list = [];
-  final List<String> imageslist = [
-    'assets/image1.png',
-    'assets/image2.png',
-    'assets/image3.png',
-  ];
+  // final List<String> imageslist = [
+  //   'assets/image1.png',
+  //   'assets/image2.png',
+  //   'assets/image3.png',
+  // ];
+  API api = API();
+  bool _isLoading = false;
+
+  List<ViolationHistory> violationlist = [];
+
+  Future<void> _getviolationhistoryfornakabyid(
+      int chowkiid, int wardenid) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      var response = await api.getviolationhistorybynakaid(chowkiid, wardenid);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        List<dynamic> violationmap = data['violation_histories'] ?? [];
+        violationlist =
+            violationmap.map((e) => ViolationHistory.fromMap(e)).toList();
+        if (violationlist.isEmpty) {
+        } else {
+          ViolationHistory? matched;
+
+          try {
+            matched = violationlist
+                .firstWhere((v) => v.id == widget.violationhistory.id);
+          } catch (e) {
+            matched = null;
+          }
+          if (matched != null) {
+            widget.violationhistory.status = matched.status;
+            setState(() {});
+
+            // Add more fields as needed
+          }
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Violation History Fetched successfully')),
+        );
+      } else if (response.statusCode == 404) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No Violation History Found Found')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to fetch Violation History')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   Future<void> _fetchImages(int id) async {
-    final url =
-        'http://192.168.1.5:4321/get-images/$id'; // Replace with your server URL
+    final url = '${API.baseurl}/get-images/$id'; // Replace with your server URL
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -50,41 +111,103 @@ class _ViolationDetailsScreenState extends State<ViolationDetailsScreen> {
     }
   }
 
+  Future<bool> send_Notification_to_link_naka() async {
+    print("Sending Notifications to Link Naka");
+
+    try {
+      var response = await api.send_notificationto_link_Naka(
+        widget.nakaid,
+        widget.violationhistory.licenseplate,
+        3,
+        widget.violationhistory.location,
+        widget.violationhistory.id,
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> linknakalist = json.decode(response.body);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                linknakalist.isEmpty
+                    ? 'No Link Notifications Found'
+                    : 'Notifications Sent Successfully',
+              ),
+            ),
+          );
+        }
+        return true;
+      } else if (response.statusCode == 404) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('No Link Naka Found')),
+          );
+        }
+        return true;
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text('Failed to Send Notifications to Link Naka')),
+          );
+        }
+        return false;
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+      return false;
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-
+    _getviolationhistoryfornakabyid(widget.nakaid, widget.wardenid);
     _fetchImages(widget.violationhistory.id);
   }
 
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
   int currentIndex = 0;
 
   void _nextImage() {
     if (currentIndex < imageData_list.length - 1) {
-      setState(() {
-        currentIndex++;
-      });
+      int targetIndex = currentIndex + 1;
+
       _pageController.animateToPage(
-        currentIndex,
+        targetIndex,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
+
+      setState(() {
+        currentIndex = targetIndex;
+      });
     }
   }
 
   void _previousImage() {
     if (currentIndex > 0) {
-      // Animate to the previous page before updating the index
+      int targetIndex = currentIndex - 1;
+
       _pageController.animateToPage(
-        currentIndex - 1,
+        targetIndex,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
 
-      // Update the current index after the animation
       setState(() {
-        currentIndex--;
+        currentIndex = targetIndex;
       });
     }
   }
@@ -141,17 +264,18 @@ class _ViolationDetailsScreenState extends State<ViolationDetailsScreen> {
                           ],
                         ),
                         child: IconButton(
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.teal
-                                .shade900, // Darker arrow color for contrast
-                            size: 30, // Larger size for the back arrow
-                          ),
-                          onPressed: () {
-                            Navigator.pop(
-                                context); // Go back to the previous screen
-                          },
-                        ),
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Colors.teal
+                                  .shade900, // Darker arrow color for contrast
+                              size: 30, // Larger size for the back arrow
+                            ),
+                            onPressed: () {
+                              Navigator.pop(
+                                  context,
+                                  widget.violationhistory
+                                      .status); // Go back to the previous screen
+                            }),
                       ),
                     ),
                   ),
@@ -185,8 +309,6 @@ class _ViolationDetailsScreenState extends State<ViolationDetailsScreen> {
             Center(
               child: Container(
                 padding: const EdgeInsets.all(12),
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   color: Colors.white,
@@ -204,15 +326,15 @@ class _ViolationDetailsScreenState extends State<ViolationDetailsScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildRow(Icons.calendar_today, "Violation Date:",
-                        "${widget.violationhistory.violationDatetime}"),
+                        widget.violationhistory.violationDatetime),
                     _buildRow(Icons.location_on, "Violation Location:",
-                        "${widget.violationhistory.location}"),
+                        widget.violationhistory.location),
                     _buildRow(Icons.directions_car, "Vehicle Number:",
-                        "${widget.violationhistory.licenseplate}"),
+                        widget.violationhistory.licenseplate),
                     _buildRow(Icons.motorcycle, "Vehicle Type:",
-                        "${widget.violationhistory.vehicletype}"),
+                        widget.violationhistory.vehicletype),
                     _buildRow(Icons.warning, "Status:",
-                        "${widget.violationhistory.status}"),
+                        widget.violationhistory.status),
                     const Divider(thickness: 1, height: 20),
                     Text(
                       "Violations:",
@@ -266,7 +388,7 @@ class _ViolationDetailsScreenState extends State<ViolationDetailsScreen> {
                               border: Border.all(color: Colors.grey.shade400),
                             ),
                             child: Image.network(
-                              "http://127.0.0.1:4321/uploads/${imageData_list[index].imagePath}",
+                              "${API.baseurl}/uploads/${imageData_list[index].imagePath}",
                               fit: BoxFit.contain,
                               width: double.infinity,
                               height: double.infinity,
@@ -296,7 +418,7 @@ class _ViolationDetailsScreenState extends State<ViolationDetailsScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            widget.violationhistory.status == "Pending"
+            widget.violationhistory.status != "Issue"
                 ? SizedBox(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -308,8 +430,8 @@ class _ViolationDetailsScreenState extends State<ViolationDetailsScreen> {
                               BorderRadius.circular(10), // No rounding
                         ),
                       ),
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        bool check = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CreateChallanScreen(
@@ -318,9 +440,44 @@ class _ViolationDetailsScreenState extends State<ViolationDetailsScreen> {
                             ),
                           ),
                         );
+                        if (check) {
+                          setState(() {
+                            _getviolationhistoryfornakabyid(
+                                widget.nakaid, widget.wardenid);
+                          });
+                        }
                       },
                       child: const Text(
                         "Create Challan",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  )
+                : SizedBox(),
+            const SizedBox(height: 20),
+            widget.violationhistory.status != "Issue"
+                ? SizedBox(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        minimumSize: const Size.fromHeight(50),
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(10), // No rounding
+                        ),
+                      ),
+                      onPressed: () async {
+                        bool check = await send_Notification_to_link_naka();
+                        if (check) {
+                          setState(() {
+                            _getviolationhistoryfornakabyid(
+                                widget.nakaid, widget.wardenid);
+                          });
+                        }
+                      },
+                      child: const Text(
+                        "Notify Link Naka",
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),

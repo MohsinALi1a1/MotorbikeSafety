@@ -262,7 +262,7 @@ class _updateviolationState extends State<UpdateViolation> {
           children: [
             const SizedBox(height: 10),
             TextField(
-              controller: _namecontroller!,
+              controller: _namecontroller,
               decoration: InputDecoration(
                 labelText: 'Enter Violation Type',
                 labelStyle: TextStyle(
@@ -394,8 +394,8 @@ class _updateviolationState extends State<UpdateViolation> {
                     SwitchListTile(
                       title: Text(
                         _isChecked
-                            ? "Current sitting limit is 2. Turn off to allow 1 person only."
-                            : "Current sitting limit is 1. Turn on to allow 2 persons.",
+                            ? "Current sitting limit is 1. Turn OFF to allow 2 persons."
+                            : "Current sitting limit is 2. Turn ON to allow 1 person only.",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),

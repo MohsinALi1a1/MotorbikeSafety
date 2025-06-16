@@ -339,7 +339,7 @@ class _WardenHomeScreenState extends State<WardenHomeScreen> {
 
             // Display the list of places
             Expanded(
-                child: wardenList.length > 0
+                child: wardenList.isNotEmpty
                     ? ListView.builder(
                         itemCount: wardenList.length,
                         itemBuilder: (context, index) {

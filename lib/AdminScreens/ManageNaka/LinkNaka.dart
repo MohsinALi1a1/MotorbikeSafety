@@ -15,8 +15,7 @@ class LinkNaka extends StatefulWidget {
   final Naka naka;
   final List<Linknaka> selectednaka;
 
-  LinkNaka({Key? key, required this.naka, required this.selectednaka})
-      : super(key: key);
+  const LinkNaka({super.key, required this.naka, required this.selectednaka});
 
   @override
   _LinkNakaState createState() => _LinkNakaState();
@@ -459,7 +458,7 @@ class _LinkNakaState extends State<LinkNaka> {
                 ),
                 // Display the list of places
                 Expanded(
-                    child: unselectednaka.length > 0
+                    child: unselectednaka.isNotEmpty
                         ? ListView.builder(
                             itemCount: unselectednaka.length,
                             itemBuilder: (context, index) {

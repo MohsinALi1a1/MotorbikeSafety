@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:motorbikesafety/AdminScreens/OtherScreens/NotificationDetailPage.dart';
 
 class NotificationsPage extends StatefulWidget {
+  const NotificationsPage({super.key});
+
   @override
   _NotificationsPageState createState() => _NotificationsPageState();
 }

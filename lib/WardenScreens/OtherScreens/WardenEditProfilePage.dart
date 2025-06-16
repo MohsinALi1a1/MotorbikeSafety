@@ -5,7 +5,7 @@ import 'dart:io';
 class WardenEditAdminProfilePage extends StatefulWidget {
   final Map<String, String> wardenDetails;
 
-  WardenEditAdminProfilePage({required this.wardenDetails});
+  const WardenEditAdminProfilePage({super.key, required this.wardenDetails});
 
   @override
   _EditAdminProfilePageState createState() => _EditAdminProfilePageState();

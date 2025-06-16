@@ -6,6 +6,8 @@ import 'package:motorbikesafety/Service/ApiHandle.dart';
 import 'package:motorbikesafety/WardenMain.dart';
 
 class WardenLoginPage extends StatefulWidget {
+  const WardenLoginPage({super.key});
+
   @override
   State<WardenLoginPage> createState() => _WardenLoginPageState();
 }

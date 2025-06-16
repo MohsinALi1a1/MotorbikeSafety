@@ -13,7 +13,7 @@ class Addviolation extends StatefulWidget {
 class _AddviolationState extends State<Addviolation> {
   API api = API();
   bool _isLoading = false;
-  bool _isChecked = false;
+  final bool _isChecked = false;
 
   final TextEditingController _namecontroller = TextEditingController();
   final TextEditingController _limitcontroller = TextEditingController();
@@ -43,7 +43,7 @@ class _AddviolationState extends State<Addviolation> {
     try {
       // Call the API method to save the city
       bool success = await api.addviolation(_namecontroller.text,
-          _descriptioncontroller.text, limit!, int.parse(_finecontroller.text));
+          _descriptioncontroller.text, limit, int.parse(_finecontroller.text));
       if (success) {
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
@@ -297,77 +297,77 @@ class _AddviolationState extends State<Addviolation> {
               ),
             ),
             const SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Checkbox(
-                  value: _isChecked,
-                  activeColor: Colors.blue, // Checkbox color when checked
-                  checkColor: Colors.white, // Tick mark color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5), // Rounded corners
-                  ),
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _isChecked = value ?? false;
-                    });
-                  },
-                ),
-                Text(
-                  "Do You want to Set Limit?",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-            _isChecked
-                ? TextField(
-                    keyboardType: TextInputType.number, // Number keypad
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly
-                    ], // Restricts input to digits only
-                    controller: _limitcontroller,
-                    decoration: InputDecoration(
-                      labelText: 'Enter Limit ',
-                      labelStyle: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.normal,
-                        fontSize: 16,
-                      ),
-                      hintText: 'Enter the Limit ',
-                      hintStyle: TextStyle(
-                        color: Colors.grey.shade500,
-                      ),
-                      prefixIcon:
-                          Icon(Icons.rule, color: Colors.teal, size: 18),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.teal,
-                          width: 1.5,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.teal, // Unfocused border color
-                          width: 1.5,
-                        ),
-                      ),
-                      // The border when the TextFormField is focused
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.teal, // Focused border color
-                          width: 2.0, // Thicker border when focused
-                        ),
-                      ),
-                    ),
-                  )
-                : SizedBox(),
+            // Row(
+            //   mainAxisSize: MainAxisSize.min,
+            //   children: [
+            //     Checkbox(
+            //       value: _isChecked,
+            //       activeColor: Colors.blue, // Checkbox color when checked
+            //       checkColor: Colors.white, // Tick mark color
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(5), // Rounded corners
+            //       ),
+            //       onChanged: (bool? value) {
+            //         setState(() {
+            //           _isChecked = value ?? false;
+            //         });
+            //       },
+            //     ),
+            //     Text(
+            //       "Do You want to Set Limit?",
+            //       style: TextStyle(
+            //         fontSize: 16,
+            //         fontWeight: FontWeight.w500,
+            //         color: Colors.black87,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // _isChecked
+            //     ? TextField(
+            //         keyboardType: TextInputType.number, // Number keypad
+            //         inputFormatters: [
+            //           FilteringTextInputFormatter.digitsOnly
+            //         ], // Restricts input to digits only
+            //         controller: _limitcontroller,
+            //         decoration: InputDecoration(
+            //           labelText: 'Enter Limit ',
+            //           labelStyle: TextStyle(
+            //             color: Colors.black,
+            //             fontWeight: FontWeight.normal,
+            //             fontSize: 16,
+            //           ),
+            //           hintText: 'Enter the Limit ',
+            //           hintStyle: TextStyle(
+            //             color: Colors.grey.shade500,
+            //           ),
+            //           prefixIcon:
+            //               Icon(Icons.rule, color: Colors.teal, size: 18),
+            //           border: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(12),
+            //             borderSide: BorderSide(
+            //               color: Colors.teal,
+            //               width: 1.5,
+            //             ),
+            //           ),
+            //           enabledBorder: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(12),
+            //             borderSide: BorderSide(
+            //               color: Colors.teal, // Unfocused border color
+            //               width: 1.5,
+            //             ),
+            //           ),
+            //           // The border when the TextFormField is focused
+            //           focusedBorder: OutlineInputBorder(
+            //             borderRadius: BorderRadius.circular(12),
+            //             borderSide: BorderSide(
+            //               color: Colors.teal, // Focused border color
+            //               width: 2.0, // Thicker border when focused
+            //             ),
+            //           ),
+            //         ),
+            //       )
+            //     : SizedBox(),
             const SizedBox(height: 10),
 
             // Save Button

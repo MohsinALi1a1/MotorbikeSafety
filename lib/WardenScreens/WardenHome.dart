@@ -8,8 +8,6 @@ import 'package:motorbikesafety/Model/NotificationModel.dart';
 
 import 'package:motorbikesafety/Service/ApiHandle.dart';
 import 'package:motorbikesafety/WardenScreens/Challan/ChallanHistory.dart';
-
-import 'package:motorbikesafety/WardenScreens/Challan/CreateChallanScreen.dart';
 import 'package:motorbikesafety/WardenScreens/DutyRoster/DutyRosterDetailsScreen.dart';
 import 'package:motorbikesafety/WardenScreens/OtherScreens/WardenNotification.dart';
 
@@ -110,10 +108,10 @@ class _Wardenhome_pageState extends State<Wardenhome_page> {
         } else {
           Naka_id = dlist[0].chowki_id;
           chowkiController.text =
-              dlist[0].chowkiName + "   (" + dlist[0].chowkiPlace + ")";
+              "${dlist[0].chowkiName!}   (${dlist[0].chowkiPlace!})";
 
           shiftController.text =
-              dlist[0].shiftName + "   (" + dlist[0].shiftTime + ")";
+              "${dlist[0].shiftName!}   (${dlist[0].shiftTime!})";
           Wardenname = dlist[0].wardenName;
         }
         ScaffoldMessenger.of(context).showSnackBar(
@@ -142,7 +140,11 @@ class _Wardenhome_pageState extends State<Wardenhome_page> {
   @override
   void initState() {
     super.initState();
-    _getwardensdutyrosterbyid(widget.id);
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _getwardensdutyrosterbyid(widget.id);
     fetchNotifications();
     startFetchingNotifications();
   }
@@ -198,14 +200,16 @@ class _Wardenhome_pageState extends State<Wardenhome_page> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Welcome Back,${Wardenname!}",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Wardenname != null
+                          ? Text(
+                              "Welcome Back,$Wardenname",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                          : CircularProgressIndicator(),
                       Stack(
                         children: [
                           IconButton(

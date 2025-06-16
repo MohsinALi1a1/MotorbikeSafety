@@ -9,8 +9,8 @@ class LinkCamera extends StatefulWidget {
   final Direction direction;
   final List<Camera> selectedCameras;
 
-  LinkCamera({Key? key, required this.direction, required this.selectedCameras})
-      : super(key: key);
+  const LinkCamera(
+      {super.key, required this.direction, required this.selectedCameras});
 
   @override
   _LinkCameraState createState() => _LinkCameraState();

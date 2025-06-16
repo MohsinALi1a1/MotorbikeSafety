@@ -153,7 +153,7 @@ class _DutyRoasterTableState extends State<DutyRoasterTable> {
               ? const Center(
                   child: CircularProgressIndicator()) // Show loading spinner
               : Expanded(
-                  child: dlist.length > 0
+                  child: dlist.isNotEmpty
                       ? SingleChildScrollView(
                           scrollDirection: Axis.vertical,
                           child: SingleChildScrollView(

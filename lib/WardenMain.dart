@@ -11,8 +11,7 @@ import 'package:motorbikesafety/WardenScreens/WardenHome.dart';
 
 class Wardenmain extends StatefulWidget {
   final int id;
-  const Wardenmain({Key? key, required this.id})
-      : super(key: key); // Updated constructor
+  const Wardenmain({super.key, required this.id}); // Updated constructor
 
   @override
   _MyAppState createState() => _MyAppState();

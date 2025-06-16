@@ -5,12 +5,12 @@ import 'package:motorbikesafety/Model/Camera.dart';
 import 'package:motorbikesafety/Model/City.dart';
 
 class API {
-  static final String _baseurl = 'http://192.168.1.5:4321';
+  static final String baseurl = 'http://192.168.1.19:4321';
 
   // City CRUD Operations   get, add ,delete
 
   Future<http.Response> getAllCities() async {
-    String url = '$_baseurl/city';
+    String url = '$baseurl/city';
     try {
       // Assuming the endpoint for cities is /cities
       var response = await http.get(Uri.parse(url));
@@ -22,7 +22,7 @@ class API {
 
   // Method to add a city
   Future<bool> addCity(City city) async {
-    String url = '$_baseurl/addcity';
+    String url = '$baseurl/addcity';
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -41,7 +41,7 @@ class API {
   }
 
   Future<bool> deleteCity(String name) async {
-    String url = '$_baseurl/deletecity';
+    String url = '$baseurl/deletecity';
     try {
       var response = await http.delete(
         Uri.parse(url),
@@ -63,7 +63,7 @@ class API {
 
   Future<http.Response> getAllplaces(String name) async {
     String url =
-        '$_baseurl/place?name=$name'; // Assuming 'name' is a query parameter
+        '$baseurl/place?name=$name'; // Assuming 'name' is a query parameter
 
     try {
       var response = await http.get(
@@ -77,7 +77,7 @@ class API {
   }
 
   Future<bool> deleteplace(String placename, String cityname) async {
-    String url = '$_baseurl/deleteplace';
+    String url = '$baseurl/deleteplace';
     try {
       var response = await http.delete(
         Uri.parse(url),
@@ -99,7 +99,7 @@ class API {
   }
 
   Future<bool> addplace(String placename, String cityname) async {
-    String url = '$_baseurl/addplace';
+    String url = '$baseurl/addplace';
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -123,7 +123,7 @@ class API {
 // Crud operation on Direction get , delete ,add
   Future<http.Response> getAllDirection(String name) async {
     String url =
-        '$_baseurl/directions?name=$name'; // Assuming 'name' is a query parameter
+        '$baseurl/directions?name=$name'; // Assuming 'name' is a query parameter
 
     try {
       var response = await http.get(
@@ -137,7 +137,7 @@ class API {
   }
 
   Future<bool> deletedirection(String directionname, String placename) async {
-    String url = '$_baseurl/deletedirection';
+    String url = '$baseurl/deletedirection';
     try {
       var response = await http.delete(
         Uri.parse(url),
@@ -159,7 +159,7 @@ class API {
   }
 
   Future<bool> adddirection(String directionname, String placename) async {
-    String url = '$_baseurl/adddirection';
+    String url = '$baseurl/adddirection';
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -184,7 +184,7 @@ class API {
 // Crud operation on Direction get , delete ,add
   Future<http.Response> getAllCamera(
       String placename, String directionname) async {
-    String url = '$_baseurl/camera';
+    String url = '$baseurl/camera';
 
     try {
       var response = await http.post(
@@ -203,7 +203,7 @@ class API {
 
   Future<bool> deleteCamera(
       String name, String directionname, String cameratype) async {
-    String url = '$_baseurl/deletecamera';
+    String url = '$baseurl/deletecamera';
     try {
       var response = await http.delete(
         Uri.parse(url),
@@ -226,7 +226,7 @@ class API {
   }
 
   Future<bool> addcamera(String name, String directionname, String type) async {
-    String url = '$_baseurl/addcamera';
+    String url = '$baseurl/addcamera';
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -249,7 +249,7 @@ class API {
 
   Future<bool> addNaka(
       String name, String placename, List<Camera> cameralist) async {
-    String url = '$_baseurl/addchowki';
+    String url = '$baseurl/addchowki';
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -269,7 +269,7 @@ class API {
   }
 
   Future<http.Response> getAllNaka(String placename) async {
-    String url = '$_baseurl/chowki';
+    String url = '$baseurl/chowki';
 
     try {
       var response = await http.post(
@@ -286,7 +286,7 @@ class API {
   }
 
   Future<bool> deletenaka(String name, String placename) async {
-    String url = '$_baseurl/deletechowki';
+    String url = '$baseurl/deletechowki';
     try {
       var response = await http.delete(
         Uri.parse(url),
@@ -308,7 +308,7 @@ class API {
   }
 
   Future<bool> addcameraNaka(List<Camera> cameraname, String chowkiname) async {
-    String url = '$_baseurl/linkcamerachowki';
+    String url = '$baseurl/linkcamerachowki';
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -326,12 +326,12 @@ class API {
       }
     } catch (e) {
       print(e);
-      throw Exception('Error adding Naka: $e');
+      throw Exception('Error adding camera with Naka: $e');
     }
   }
 
   Future<http.Response> getAllCamerasofNaka(String chowkiname) async {
-    String url = '$_baseurl/linkcamerawithchowki';
+    String url = '$baseurl/linkcamerawithchowki';
 
     try {
       var response = await http.post(
@@ -348,7 +348,7 @@ class API {
   }
 
   Future<http.Response> getAllNakaofNaka(int Nakaid) async {
-    String url = '$_baseurl/getnakadirectlink';
+    String url = '$baseurl/getnakadirectlink';
 
     try {
       var response = await http.post(
@@ -366,7 +366,7 @@ class API {
 
   Future<http.Response> add_NakawithNaka(
       int FromNakaID, ToNakaIDlist, distanceList) async {
-    String url = '$_baseurl/linkNakawithnaka';
+    String url = '$baseurl/linkNakawithnaka';
 
     try {
       var response = await http.post(
@@ -385,7 +385,7 @@ class API {
   }
 
   Future<bool> deleteLinknaka(int nakaid, int tonaka) async {
-    String url = '$_baseurl/deletelinknaka';
+    String url = '$baseurl/deletelinknaka';
     try {
       var response = await http.delete(
         Uri.parse(url),
@@ -407,14 +407,14 @@ class API {
   // Crud Operations on Shifts get , add, delete
   Future<http.Response> getAllShifts() async {
     String url =
-        '$_baseurl/shift'; // Assuming the endpoint for cities is /cities
+        '$baseurl/shift'; // Assuming the endpoint for cities is /cities
     var response = await http.get(Uri.parse(url));
     return response;
   }
 
   Future<bool> addshift(
       String shiftname, String starttime, String endtime) async {
-    String url = '$_baseurl/addshift';
+    String url = '$baseurl/addshift';
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -438,7 +438,7 @@ class API {
 
   Future<bool> deleteshift(
       String shiftname, String starttime, String endtime) async {
-    String url = '$_baseurl/deleteshift';
+    String url = '$baseurl/deleteshift';
     try {
       var response = await http.delete(
         Uri.parse(url),
@@ -463,7 +463,7 @@ class API {
 // Crud Operation on Warden (add, get , delete)
   Future<bool> addwarden(String name, String address, String cnic, String email,
       String mobilenumber, String cityname) async {
-    String url = '$_baseurl/addtrafficwarden';
+    String url = '$baseurl/addtrafficwarden';
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -489,7 +489,7 @@ class API {
   }
 
   Future<http.Response> getAllwardens(String cityname) async {
-    String url = '$_baseurl/wardensincity';
+    String url = '$baseurl/wardensincity';
     print(cityname); // Assuming 'name' is a query parameter
 
     try {
@@ -504,7 +504,7 @@ class API {
   }
 
   Future<bool> deletewarden(String cnic) async {
-    String url = '$_baseurl/deletewarden';
+    String url = '$baseurl/deletewarden';
     try {
       var response = await http.delete(
         Uri.parse(url),
@@ -526,7 +526,7 @@ class API {
 
   // Method to Login Warden
   Future<http.Response> wardenlogin(String badge, String password) async {
-    String url = '$_baseurl/wardenlogin';
+    String url = '$baseurl/wardenlogin';
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -540,10 +540,25 @@ class API {
     }
   }
 
+  Future<http.Response> userlogin(String cnic, String password) async {
+    String url = '$baseurl/Userlogin';
+    try {
+      var response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: json.encode({'Cnic': cnic, 'password': password}),
+      );
+
+      return response;
+    } catch (e) {
+      throw Exception('Error Login User: $e');
+    }
+  }
+
 // Crud Operations on Duty Roster get
   Future<http.Response> getAlldutyroster() async {
     String url =
-        '$_baseurl/getassignjobs'; // Assuming 'name' is a query parameter
+        '$baseurl/getassignjobs'; // Assuming 'name' is a query parameter
 
     try {
       var response = await http.get(
@@ -557,7 +572,7 @@ class API {
   }
 
   Future<http.Response> autodutyroster() async {
-    String url = '$_baseurl/wardenassignments';
+    String url = '$baseurl/wardenassignments';
 
     try {
       var response = await http.post(
@@ -571,7 +586,7 @@ class API {
   }
 
   Future<http.Response> getwardendutyrosterbyid(int id) async {
-    String url = '$_baseurl/getassignjobofwardenbyid';
+    String url = '$baseurl/getassignjobofwardenbyid';
     print(id); // Assuming 'name' is a query parameter
 
     try {
@@ -585,13 +600,28 @@ class API {
     }
   }
 
+  Future<http.Response> getuserbyid(int id) async {
+    String url = '$baseurl/userbyid';
+    print(id); // Assuming 'name' is a query parameter
+
+    try {
+      var response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode({"id": id}));
+
+      return response;
+    } catch (e) {
+      throw Exception('Error fetching User: $e');
+    }
+  }
+
   Future<bool> addviolation(
     String name,
     String description,
     int limitValue,
     int fine,
   ) async {
-    String url = '$_baseurl/violation';
+    String url = '$baseurl/violation';
     try {
       var response = await http.post(
         Uri.parse(url),
@@ -615,7 +645,7 @@ class API {
   }
 
   Future<http.Response> getAllViolation() async {
-    String url = '$_baseurl/violations'; // Assuming 'name' is a query parameter
+    String url = '$baseurl/violations'; // Assuming 'name' is a query parameter
 
     try {
       var response = await http.get(
@@ -629,26 +659,26 @@ class API {
   }
 
   Future<bool> updateviolation(
-      int violation_id,
-      String? new_name,
-      String? new_description,
+      int violationId,
+      String? newName,
+      String? newDescription,
       int? newlimitValue,
       int? newfine,
-      DateTime? start_date,
-      DateTime? end_date) async {
-    String url = '$_baseurl/updateviolation';
+      DateTime? startDate,
+      DateTime? endDate) async {
+    String url = '$baseurl/updateviolation';
     try {
       var response = await http.put(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: json.encode({
-          'violation_id': violation_id,
-          'new_name': new_name,
-          'new_description': new_description,
+          'violation_id': violationId,
+          'new_name': newName,
+          'new_description': newDescription,
           'newlimitValue': newlimitValue,
           'newfine': newfine,
-          'start_date': start_date?.toIso8601String(),
-          'end_date': end_date?.toIso8601String(),
+          'start_date': startDate?.toIso8601String(),
+          'end_date': endDate?.toIso8601String(),
         }),
       );
 
@@ -663,16 +693,16 @@ class API {
   }
 
   Future<bool> updateviolationstatus(
-    int violation_id,
+    int violationId,
     String? Status,
   ) async {
-    String url = '$_baseurl/updateviolationstatus';
+    String url = '$baseurl/updateviolationstatus';
     try {
       var response = await http.put(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: json.encode({
-          'violation_id': violation_id,
+          'violation_id': violationId,
           'Status': Status,
         }),
       );
@@ -687,16 +717,16 @@ class API {
     }
   }
 
-  Future<http.Response> getViolation(int violation_id) async {
+  Future<http.Response> getViolation(int violationId) async {
     String url =
-        '$_baseurl/violationsbyid'; // Assuming 'name' is a query parameter
+        '$baseurl/violationsbyid'; // Assuming 'name' is a query parameter
 
     try {
       var response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: json.encode({
-          'violation_id': violation_id,
+          'violation_id': violationId,
         }),
       );
       return response;
@@ -705,14 +735,15 @@ class API {
     }
   }
 
-  Future<http.Response> getviolationhistorybynakaid(int chowki_id) async {
-    String url = '$_baseurl/getviolationsrecord_for_nakaid';
-    print(chowki_id); // Assuming 'name' is a query parameter
+  Future<http.Response> getviolationhistorybynakaid(
+      int chowkiId, int wardenId) async {
+    String url = '$baseurl/getviolationsrecord_for_nakaid';
+    // Assuming 'name' is a query parameter
 
     try {
       var response = await http.post(Uri.parse(url),
           headers: {"Content-Type": "application/json"},
-          body: json.encode({"chowki_id": chowki_id}));
+          body: json.encode({"warden_id": wardenId}));
 
       return response;
     } catch (e) {
@@ -721,7 +752,7 @@ class API {
   }
 
   Future<http.Response> getVehiclebyid(int id) async {
-    String url = '$_baseurl/vehiclebyid';
+    String url = '$baseurl/vehiclebyid';
 
     try {
       var response = await http.post(
@@ -739,29 +770,29 @@ class API {
 
   // Crud Operation on Warden (add, get , delete)
   Future<http.Response> addchallan(
-      int violation_history_id,
-      List<int> violation_ids,
-      String violator_cnic,
-      String violator_name,
-      String mobile_number,
-      String vehicle_number,
-      int warden_id,
-      double fine_amount,
+      int violationHistoryId,
+      List<int> violationIds,
+      String violatorCnic,
+      String violatorName,
+      String mobileNumber,
+      String vehicleNumber,
+      int wardenId,
+      double fineAmount,
       String status) async {
-    String url = '$_baseurl/addchallanrecord';
+    String url = '$baseurl/addchallanrecord';
     try {
       var response = await http.post(
         Uri.parse(url),
         headers: {"Content-Type": "application/json"},
         body: json.encode({
-          'violation_history_id': violation_history_id,
-          'violation_ids': violation_ids,
-          'violator_cnic': violator_cnic,
-          'violator_name': violator_name,
-          'mobile_number': mobile_number,
-          'vehicle_number': vehicle_number,
-          'warden_id': warden_id,
-          'fine_amount': fine_amount,
+          'violation_history_id': violationHistoryId,
+          'violation_ids': violationIds,
+          'violator_cnic': violatorCnic,
+          'violator_name': violatorName,
+          'mobile_number': mobileNumber,
+          'vehicle_number': vehicleNumber,
+          'warden_id': wardenId,
+          'fine_amount': fineAmount,
           'status': status
         }),
       );
@@ -772,14 +803,14 @@ class API {
     }
   }
 
-  Future<http.Response> getchallanhistorybywardenid(int warden_id) async {
-    String url = '$_baseurl/getchallans';
-    print(warden_id); // Assuming 'name' is a query parameter
+  Future<http.Response> getchallanhistorybywardenid(int wardenId) async {
+    String url = '$baseurl/getchallans';
+    print(wardenId); // Assuming 'name' is a query parameter
 
     try {
       var response = await http.post(Uri.parse(url),
           headers: {"Content-Type": "application/json"},
-          body: json.encode({"warden_id": warden_id}));
+          body: json.encode({"warden_id": wardenId}));
 
       return response;
     } catch (e) {
@@ -787,22 +818,73 @@ class API {
     }
   }
 
-  Future<http.Response> getnotificationbywardenid(int recipient_id) async {
-    String recipient_type = "TrafficWarden";
-    String url = '$_baseurl/getnotifications';
-    print(recipient_id); // Assuming 'name' is a query parameter
+  Future<http.Response> getnotificationbywardenid(int recipientId) async {
+    String recipientType = "TrafficWarden";
+    String url = '$baseurl/getnotifications';
+    print(recipientId); // Assuming 'name' is a query parameter
+
+    try {
+      var response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode(
+              {"recipient_id": recipientId, "recipient_type": recipientType}));
+
+      return response;
+    } catch (e) {
+      throw Exception('Error fetching Notification For Warden: $e');
+    }
+  }
+
+  Future<http.Response> send_notificationto_link_Naka(int FromNakaID,
+      String bike, int hops, String location, int violationhistoryId) async {
+    String url = '$baseurl/testing_get_naka';
 
     try {
       var response = await http.post(Uri.parse(url),
           headers: {"Content-Type": "application/json"},
           body: json.encode({
-            "recipient_id": recipient_id,
-            "recipient_type": recipient_type
+            "FromNakaID": FromNakaID,
+            "bike": bike,
+            "hops": hops,
+            "location": location,
+            "violationhistory_id": violationhistoryId
           }));
 
       return response;
     } catch (e) {
-      throw Exception('Error fetching Notification For Warden: $e');
+      throw Exception('Error Sending  Notification to Link Naka: $e');
+    }
+  }
+
+  Future<http.Response> getchallanhistorybyuserid(int userCnic) async {
+    String url = '$baseurl/getchallans';
+    print(userCnic); // Assuming 'name' is a query parameter
+
+    try {
+      var response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode({"user_id": userCnic}));
+
+      return response;
+    } catch (e) {
+      throw Exception('Error fetching Challan History For USerCnic: $e');
+    }
+  }
+
+  Future<http.Response> getnotificationbyuserid(int recipientId) async {
+    String recipientType = "User";
+    String url = '$baseurl/getnotifications';
+    print(recipientId); // Assuming 'name' is a query parameter
+
+    try {
+      var response = await http.post(Uri.parse(url),
+          headers: {"Content-Type": "application/json"},
+          body: json.encode(
+              {"recipient_id": recipientId, "recipient_type": recipientType}));
+
+      return response;
+    } catch (e) {
+      throw Exception('Error fetching Notification For USer: $e');
     }
   }
 }

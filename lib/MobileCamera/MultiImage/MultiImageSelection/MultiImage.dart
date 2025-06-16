@@ -162,7 +162,7 @@ class _MultiImagePickerScreenState extends State<MultiImagePickerScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                  'No Camera found for the ${placename} at point ${directionname} ')),
+                  'No Camera found for the $placename at point $directionname ')),
         );
       } else {
         cameraList = [];
@@ -269,8 +269,8 @@ class _MultiImagePickerScreenState extends State<MultiImagePickerScreen> {
   Future<void> _uploadImages() async {
     if (_images.isEmpty) return;
 
-    final uri = Uri.parse(
-        "http://127.0.0.1:4321/upload-images"); // Replace with your API URL
+    final uri =
+        Uri.parse("${API.baseurl}/upload-images"); // Replace with your API URL
 
     final request = http.MultipartRequest('POST', uri);
 

@@ -8,17 +8,19 @@ import 'package:motorbikesafety/Model/ViolationImage.dart';
 import 'package:motorbikesafety/Service/ApiHandle.dart';
 import 'package:motorbikesafety/WardenScreens/Challan/CreateChallanScreen.dart';
 
-class ChallanDetailsScreen extends StatefulWidget {
+class ChallanDetailsScreenforuser extends StatefulWidget {
   final Challan challanhistory;
   final int wardenid;
-  const ChallanDetailsScreen(
+  const ChallanDetailsScreenforuser(
       {super.key, required this.challanhistory, required this.wardenid});
 
   @override
-  State<ChallanDetailsScreen> createState() => _ChallanDetailsScreenState();
+  State<ChallanDetailsScreenforuser> createState() =>
+      _ChallanDetailsScreenforuserState();
 }
 
-class _ChallanDetailsScreenState extends State<ChallanDetailsScreen> {
+class _ChallanDetailsScreenforuserState
+    extends State<ChallanDetailsScreenforuser> {
   List<ViolationImage> imageData_list = [];
 
   Future<void> _fetchImages(int id) async {

@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:motorbikesafety/AdminScreens/MangeViolations/ViolationHome.dart';
 import 'package:motorbikesafety/Model/NotificationModel.dart';
 import 'package:motorbikesafety/Service/ApiHandle.dart';
 
@@ -157,44 +156,37 @@ class _NotificationsPageState extends State<WardenNotificationsPage> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                     child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor:
+                      leading: CircleAvatar(
+                        backgroundColor:
+                            notificationList[index].type == "Violation Alert"
+                                ? Colors.red.withOpacity(0.2)
+                                : Colors.white,
+                        child: Icon(
+                          iconMap[notificationList[index].type],
+                          color:
                               notificationList[index].type == "Violation Alert"
-                                  ? Colors.red.withOpacity(0.2)
-                                  : Colors.white,
-                          child: Icon(
-                            iconMap[notificationList[index].type],
-                            color: notificationList[index].type ==
-                                    "Violation Alert"
-                                ? Colors.red
-                                : Colors.green,
-                          ),
+                                  ? Colors.red
+                                  : Colors.green,
                         ),
-                        title: Text(
-                          notificationList[index].type,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(notificationList[index].message),
-                            SizedBox(height: 5),
-                            Text(notificationList[index].createdAt.toString(),
-                                style: TextStyle(
-                                    color: Colors.grey, fontSize: 12)),
-                          ],
-                        ),
-                        trailing: Icon(Icons.arrow_forward_ios,
-                            size: 16, color: Colors.grey),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  ViolationsDetailScreen(), // ✅ Instantiate the widget
-                            ),
-                          );
-                        }),
+                      ),
+                      title: Text(
+                        notificationList[index].type,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(notificationList[index].message),
+                          SizedBox(height: 5),
+                          Text(notificationList[index].createdAt.toString(),
+                              style:
+                                  TextStyle(color: Colors.grey, fontSize: 12)),
+                        ],
+                      ),
+                      trailing: Icon(Icons.arrow_forward_ios,
+                          size: 16, color: Colors.grey),
+                      // onTap: () => openNotificationPage(context,  notificationList[index]),
+                    ),
                   ),
                 );
               },

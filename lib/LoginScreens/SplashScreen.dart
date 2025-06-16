@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:motorbikesafety/LoginScreens/RoleSelectionScreen.dart';
 
 class TrafficGuardianApp extends StatelessWidget {
+  const TrafficGuardianApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -13,6 +15,8 @@ class TrafficGuardianApp extends StatelessWidget {
 }
 
 class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

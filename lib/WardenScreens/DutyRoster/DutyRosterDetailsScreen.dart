@@ -4,7 +4,7 @@ import 'package:motorbikesafety/Model/DutyRoster.dart';
 class DutyRosterDetailsScreen extends StatelessWidget {
   final DutyRoster duty;
 
-  DutyRosterDetailsScreen({required this.duty});
+  const DutyRosterDetailsScreen({super.key, required this.duty});
 
   Widget _buildItem(IconData icon, String title, String value) {
     return Card(

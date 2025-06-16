@@ -19,7 +19,7 @@ import 'package:motorbikesafety/Service/ApiHandle.dart';
 
 class Adminhome_page extends StatefulWidget {
   final int id;
-  Adminhome_page({super.key, required this.id});
+  const Adminhome_page({super.key, required this.id});
 
   @override
   State<Adminhome_page> createState() => _Adminhome_pageState();

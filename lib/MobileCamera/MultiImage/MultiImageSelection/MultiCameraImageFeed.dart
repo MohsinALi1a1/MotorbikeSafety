@@ -10,6 +10,8 @@ import 'package:motorbikesafety/Model/Place.dart';
 import 'package:motorbikesafety/Service/ApiHandle.dart';
 
 class CameraUploadScreen extends StatefulWidget {
+  const CameraUploadScreen({super.key});
+
   @override
   _CameraUploadScreenState createState() => _CameraUploadScreenState();
 }
@@ -30,7 +32,7 @@ class _CameraUploadScreenState extends State<CameraUploadScreen> {
   bool isUploading = false;
 
   Future<void> _uploadImages() async {
-    final uri = Uri.parse("http://192.168.1.5:4321/upload-multicameraimages");
+    final uri = Uri.parse("${API.baseurl}/upload-multicameraimages");
     final request = http.MultipartRequest('POST', uri);
 
     List<int> indices = [];
@@ -250,7 +252,7 @@ class _CameraUploadScreenState extends State<CameraUploadScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                  'No Camera found for the ${placename} at point ${directionname} ')),
+                  'No Camera found for the $placename at point $directionname ')),
         );
       } else {
         cameraList = [];

@@ -171,7 +171,7 @@ class _ManagecameraState extends State<Managecamera> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(
-                  'No Camera found for the ${placename} at point ${directionname} ')),
+                  'No Camera found for the $placename at point $directionname ')),
         );
       } else {
         cameraList = [];
@@ -666,7 +666,7 @@ class _ManagecameraState extends State<Managecamera> {
                     ? Expanded(
                         child: Center(child: CircularProgressIndicator()))
                     : Expanded(
-                        child: filteredcameraList.length > 0
+                        child: filteredcameraList.isNotEmpty
                             ? ListView.builder(
                                 itemCount: filteredcameraList.length,
                                 itemBuilder: (context, index) {
@@ -761,7 +761,7 @@ class _ManagecameraState extends State<Managecamera> {
                                                           await _deletecamera(
                                                               camera.name,
                                                               camera.direction,
-                                                              camera.Type!);
+                                                              camera.Type);
                                                           setState(() {
                                                             _getcamera(
                                                                 selectedPlace!,

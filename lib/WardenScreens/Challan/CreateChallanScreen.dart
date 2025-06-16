@@ -80,7 +80,7 @@ class _CreateChallanScreenState extends State<CreateChallanScreen> {
   }
 
   // Fetching cities from the API
-  Future<void> _addchallanrecord() async {
+  Future<bool> _addchallanrecord() async {
     setState(() {
       _isLoading = true;
     });
@@ -88,10 +88,10 @@ class _CreateChallanScreenState extends State<CreateChallanScreen> {
     try {
       double fine = getTotalFine();
       String status = "Pending";
-      List<int> v_lits = selectedViolations.toList();
+      List<int> vLits = selectedViolations.toList();
       var response = await api.addchallan(
           widget.violationhistory.id,
-          v_lits,
+          vLits,
           cnicController.text,
           nameController.text,
           mobileController.text,
@@ -102,6 +102,10 @@ class _CreateChallanScreenState extends State<CreateChallanScreen> {
 
       if (response.statusCode == 201) {
         cnicController.text = "";
+        nameController.text = "";
+        mobileController.text = "";
+        return true;
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Challan added successfully')),
         );
@@ -109,12 +113,14 @@ class _CreateChallanScreenState extends State<CreateChallanScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to add Challan')),
         );
+        return false;
       }
     } catch (e) {
       print(e);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error csacdas: $e')),
+        SnackBar(content: Text('Error in add challan: $e')),
       );
+      return false;
     } finally {
       setState(() {
         _isLoading = false;
@@ -293,10 +299,11 @@ class _CreateChallanScreenState extends State<CreateChallanScreen> {
                       borderRadius: BorderRadius.circular(10), // No rounding
                     ),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _addchallanrecord();
-                    });
+                  onPressed: () async {
+                    bool sucess = await _addchallanrecord();
+                    if (sucess) {
+                      Navigator.pop(context, true);
+                    }
                   },
                   child: const Text(
                     'Issue Challan',

@@ -1,14 +1,83 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:motorbikesafety/LoginScreens/SignUp.dart';
+import 'package:motorbikesafety/Service/ApiHandle.dart';
+import 'package:motorbikesafety/UserScreens/UserHome.dart';
 import 'package:motorbikesafety/WardenMain.dart';
 import 'package:motorbikesafety/WardenScreens/WardenHome.dart';
 
 class UserLoginPage extends StatefulWidget {
+  const UserLoginPage({super.key});
+
   @override
   State<UserLoginPage> createState() => _UserLoginPageState();
 }
 
 class _UserLoginPageState extends State<UserLoginPage> {
+  final TextEditingController _cnicController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  API api = API();
+  bool _isLoading = false;
+
+  Future<void> _checkuserlogin(String cnic, String password) async {
+    if (_isLoading) return;
+
+    if (cnic.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter Cnic Number and Password')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      var response = await api.userlogin(cnic, password);
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = json.decode(response.body);
+
+        int? userId = int.tryParse(responseData['userid'].toString());
+
+        if (userId == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Invalid login data received')),
+          );
+          return;
+        }
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => Userhome_page(id: userId)),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login Successful')),
+        );
+      } else if (response.statusCode == 401) {
+        Map<String, dynamic> responseData = json.decode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData['message'] ?? 'Unauthorized')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to login. Try again later.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,9 +112,10 @@ class _UserLoginPageState extends State<UserLoginPage> {
                 ),
                 SizedBox(height: 30),
                 TextField(
+                  controller: _cnicController,
                   decoration: InputDecoration(
                     labelText: "Enter CNIC",
-                    hintText: "37405########9",
+                    hintText: "Enter your CNIC Number",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -56,9 +126,11 @@ class _UserLoginPageState extends State<UserLoginPage> {
                 ),
                 SizedBox(height: 20),
                 TextField(
+                  controller: _passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: "Enter Password",
+                    hintText: "Enter Your Password",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -76,13 +148,8 @@ class _UserLoginPageState extends State<UserLoginPage> {
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => Wardenmain(
-                                id: 1,
-                              )),
-                    );
+                    _checkuserlogin(
+                        _cnicController.text, _passwordController.text);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF35A29F),

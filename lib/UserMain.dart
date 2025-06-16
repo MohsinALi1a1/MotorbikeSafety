@@ -7,6 +7,8 @@ import 'package:motorbikesafety/AdminScreens/OtherScreens/AdminSetting.dart';
 import 'package:motorbikesafety/WardenScreens/WardenHome.dart';
 
 class Usermain extends StatefulWidget {
+  const Usermain({super.key});
+
   @override
   _MyAppState createState() => _MyAppState();
 }

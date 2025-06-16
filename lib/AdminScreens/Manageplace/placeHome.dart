@@ -338,7 +338,7 @@ class _PlaceDetailScreenState extends State<PlaceDetailScreen> {
 
             // Display the list of places
             Expanded(
-                child: placeList.length > 0
+                child: placeList.isNotEmpty
                     ? ListView.builder(
                         itemCount: placeList.length,
                         itemBuilder: (context, index) {

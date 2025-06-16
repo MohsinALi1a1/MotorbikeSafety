@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:motorbikesafety/Model/Vehicle.dart';
+import 'package:motorbikesafety/Model/Violation.dart';
 import 'package:motorbikesafety/Model/ViolationHistory.dart';
 import 'package:motorbikesafety/Service/ApiHandle.dart';
 import 'package:motorbikesafety/WardenScreens/Challan/CreateChallanScreen.dart';
@@ -12,8 +14,7 @@ class ViolationHistoryScreen extends StatefulWidget {
   final int warden_id;
 
   const ViolationHistoryScreen(
-      {Key? key, required this.naka_id, required this.warden_id})
-      : super(key: key);
+      {super.key, required this.naka_id, required this.warden_id});
 
   @override
   State<ViolationHistoryScreen> createState() => _ViolationHistoryScreenState();
@@ -22,24 +23,98 @@ class ViolationHistoryScreen extends StatefulWidget {
 class _ViolationHistoryScreenState extends State<ViolationHistoryScreen> {
   API api = API();
   bool _isLoading = false;
-  List<ViolationHistory> violationlist = [];
+  List<ViolationHistory> violationhistorylist = [];
+  List<ViolationHistory> filterviolationhistorylist = [];
+  String? selectedType;
+  String? selectedStatus;
+  String? selectedorder;
+  final TextEditingController _searchController = TextEditingController();
 
-  Future<void> _getviolationhistoryfornakabyid(int id) async {
+  List<String> statusList = ['Pending', 'Issue', 'Runner'];
+  List<String> sortOptions = ['Asc', 'Desc'];
+  List<Violation> violationrulelist = [];
+
+  void _applyFilters() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      filterviolationhistorylist = violationhistorylist.where((item) {
+        final matchesSearch = item.licenseplate.toLowerCase().contains(query);
+        // final matchesType = selectedType == null ||
+        //     item.violationDetails.contains(selectedType!);
+
+        final matchesStatus =
+            selectedStatus == null || item.status == selectedStatus;
+        return matchesSearch && matchesStatus;
+      }).toList();
+
+      // if (selectedorder == 'Asc') {
+      //   filterviolationhistorylist.sort((a, b) =>
+      //       DateTime.parse(a.violationDatetime)
+      //           .compareTo(DateTime.parse(b.violationDatetime)));
+      // } else if (selectedorder == 'Desc') {
+      //   filterviolationhistorylist.sort((a, b) =>
+      //       DateTime.parse(b.violationDatetime)
+      //           .compareTo(DateTime.parse(a.violationDatetime)));
+      // }
+    });
+  }
+
+  Future<void> _getViolationsRule() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      var response = await api.getAllViolation();
+
+      if (response.statusCode == 200) {
+        List<dynamic> violationrulemap = json.decode(response.body);
+        violationrulelist =
+            violationrulemap.map((e) => Violation.fromMap(e)).toList();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Violation Rule fetched successfully')),
+        );
+      } else if (response.statusCode == 404) {
+        violationrulelist = [];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No Violation Rule found ')),
+        );
+      } else {
+        violationrulelist = [];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to fetch Violation Rule')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> getviolationhistoryfornakabyid(
+      int chowkiid, int wardenid) async {
     setState(() {
       _isLoading = true;
     });
     try {
-      var response = await api.getviolationhistorybynakaid(id);
+      var response = await api.getviolationhistorybynakaid(chowkiid, wardenid);
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        List<dynamic> violationmap = data['violation_histories'] != null
-            ? data['violation_histories']
-            : [];
-        violationlist =
+        List<dynamic> violationmap = data['violation_histories'] ?? [];
+        violationhistorylist =
             violationmap.map((e) => ViolationHistory.fromMap(e)).toList();
-        if (violationlist.isEmpty) {
-        } else {}
+        filterviolationhistorylist = List.from(violationhistorylist);
+        if (violationhistorylist.isEmpty) {
+        } else {
+          setState(() {});
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Violation History Fetched successfully')),
         );
@@ -66,8 +141,9 @@ class _ViolationHistoryScreenState extends State<ViolationHistoryScreen> {
   @override
   void initState() {
     super.initState();
-
-    _getviolationhistoryfornakabyid(widget.naka_id);
+    _getViolationsRule();
+    _searchController.addListener(_applyFilters);
+    getviolationhistoryfornakabyid(widget.naka_id, widget.warden_id);
   }
 
   @override
@@ -165,28 +241,86 @@ class _ViolationHistoryScreenState extends State<ViolationHistoryScreen> {
             Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      hintText: "Violation Type or Location",
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        labelText: "Search BY Bike Number",
+                        labelStyle: GoogleFonts.poppins(fontSize: 14),
+
+                        prefixIcon: Icon(Icons.search, color: Colors.teal),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.teal,
+                            width: 1.5,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.teal, // Unfocused border color
+                            width: 1.5,
+                          ),
+                        ),
+                        // The border when the TextFormField is focused
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(
+                            color: Colors.teal, // Focused border color
+                            width: 2.0, // Thicker border when focused
+                          ),
+                        ),
                       ),
                     ),
                   ),
                 ),
                 SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    shape: CircleBorder(),
-                    padding: EdgeInsets.all(12),
-                  ),
-                  child: Icon(Icons.search, color: Colors.white),
-                ),
+                // Expanded(
+                //   child: Container(
+                //     decoration: BoxDecoration(
+                //       borderRadius: BorderRadius.circular(12),
+                //       border: Border.all(color: Colors.teal, width: 1.5),
+                //       color: Colors.white,
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: Colors.grey.shade300,
+                //           offset: Offset(0, 2),
+                //           blurRadius: 4,
+                //         ),
+                //       ],
+                //     ),
+                //     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+                //     child: DropdownButton<String>(
+                //       value: selectedorder,
+                //       hint: Text(
+                //         "Order By",
+                //         style: TextStyle(
+                //             color: Colors.black, fontWeight: FontWeight.w500),
+                //       ),
+                //       onChanged: (val) {
+                //         setState(() => selectedorder = val);
+                //         _applyFilters();
+                //       },
+                //       isExpanded: true,
+                //       underline: Container(),
+                //       icon: Icon(Icons.arrow_drop_down, color: Colors.teal),
+                //       items: sortOptions.map((s) {
+                //         return DropdownMenuItem<String>(
+                //           value: s,
+                //           child: Text(
+                //             s,
+                //             style: TextStyle(
+                //               color: Colors.black,
+                //               fontWeight: FontWeight.w600,
+                //             ),
+                //           ),
+                //         );
+                //       }).toList(),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             SizedBox(height: 10),
@@ -196,39 +330,93 @@ class _ViolationHistoryScreenState extends State<ViolationHistoryScreen> {
             SizedBox(height: 8),
             Row(
               children: [
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    hint: Text("Violation Type"),
-                    items: ["Red Light", "Speeding", "Helmet"]
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (value) {},
-                  ),
-                ),
+                // Expanded(
+                //   child: Container(
+                //     decoration: BoxDecoration(
+                //       borderRadius: BorderRadius.circular(12),
+                //       border: Border.all(color: Colors.teal, width: 1.5),
+                //       color: Colors.white,
+                //       boxShadow: [
+                //         BoxShadow(
+                //           color: Colors.grey.shade300,
+                //           offset: Offset(0, 2),
+                //           blurRadius: 4,
+                //         ),
+                //       ],
+                //     ),
+                //     padding: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+                //     child: DropdownButton<String>(
+                //       value: selectedType,
+                //       hint: Text(
+                //         "Select Violation Type",
+                //         style: TextStyle(
+                //             color: Colors.black, fontWeight: FontWeight.w500),
+                //       ),
+                //       onChanged: (val) {
+                //         setState(() => selectedType = val);
+                //         _applyFilters();
+                //       },
+                //       isExpanded: true,
+                //       underline: Container(),
+                //       icon: Icon(Icons.arrow_drop_down, color: Colors.teal),
+                //       items: violationrulelist.map((violation) {
+                //         return DropdownMenuItem<String>(
+                //           value: violation.name,
+                //           child: Text(
+                //             violation.name,
+                //             style: TextStyle(
+                //               color: Colors.black,
+                //               fontWeight: FontWeight.w600,
+                //             ),
+                //           ),
+                //         );
+                //       }).toList(),
+                //     ),
+                //   ),
+                // ),
                 SizedBox(width: 10),
                 Expanded(
-                  child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey[200],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
-                      ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.teal, width: 1.5),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade300,
+                          offset: Offset(0, 2),
+                          blurRadius: 4,
+                        ),
+                      ],
                     ),
-                    hint: Text("By Status"),
-                    items: ["All", "Pending", "Action", "Dispute"]
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (value) {},
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 3),
+                    child: DropdownButton<String>(
+                      value: selectedStatus,
+                      hint: Text(
+                        "Select Status",
+                        style: TextStyle(
+                            color: Colors.black, fontWeight: FontWeight.w500),
+                      ),
+                      onChanged: (val) {
+                        setState(() => selectedStatus = val);
+                        _applyFilters();
+                      },
+                      isExpanded: true,
+                      underline: Container(),
+                      icon: Icon(Icons.arrow_drop_down, color: Colors.teal),
+                      items: statusList.map((s) {
+                        return DropdownMenuItem<String>(
+                          value: s,
+                          child: Text(
+                            s,
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
               ],
@@ -237,7 +425,7 @@ class _ViolationHistoryScreenState extends State<ViolationHistoryScreen> {
 
             Text("Results :", style: TextStyle(fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
-            violationlist.isEmpty
+            violationhistorylist.isEmpty
                 ? Center(
                     child: Text("No Violation Record"),
                   )
@@ -245,9 +433,9 @@ class _ViolationHistoryScreenState extends State<ViolationHistoryScreen> {
                 // Violation Cards
                 Expanded(
                     child: ListView.builder(
-                      itemCount: violationlist.length,
+                      itemCount: filterviolationhistorylist.length,
                       itemBuilder: (context, index) {
-                        final violation = violationlist[index];
+                        final violation = filterviolationhistorylist[index];
                         final isPending = violation.status;
 
                         // Track tap state
@@ -273,6 +461,8 @@ class _ViolationHistoryScreenState extends State<ViolationHistoryScreen> {
                                         .join(', ')
                                     : "N/A",
                                 location: violation.location,
+                                naka_id: widget.naka_id,
+                                refreshData: getviolationhistoryfornakabyid,
                               ),
                             );
                           },
@@ -299,24 +489,38 @@ String _extractTime(String datetime) {
   return parts[4];
 }
 
-class ViolationCard extends StatelessWidget {
-  final String vehicleNumber, status, date, time, type, location;
+class ViolationCard extends StatefulWidget {
+  String vehicleNumber, status, date, time, type, location;
   final ViolationHistory violationhisrty;
   final int w_id;
+  final int naka_id;
+  final Function refreshData;
   ViolationCard(
-      {required this.violationhisrty,
+      {super.key,
+      required this.violationhisrty,
       required this.vehicleNumber,
       required this.status,
       required this.date,
       required this.time,
       required this.type,
       required this.location,
-      required this.w_id});
+      required this.w_id,
+      required this.naka_id,
+      required this.refreshData});
 
+  @override
+  State<ViolationCard> createState() => _ViolationCardState();
+}
+
+class _ViolationCardState extends State<ViolationCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: status == "Pending" ? Colors.red[200] : Colors.grey[200],
+      color: widget.status == "Pending"
+          ? Colors.red[200]
+          : widget.status == "Runner"
+              ? Colors.red[300]
+              : Colors.grey[200],
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 6,
       shadowColor: Colors.teal.withOpacity(0.3),
@@ -338,7 +542,7 @@ class ViolationCard extends StatelessWidget {
                       style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                     ),
                     Text(
-                      vehicleNumber,
+                      widget.vehicleNumber,
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -352,10 +556,12 @@ class ViolationCard extends StatelessWidget {
                     Icon(Icons.warning, color: Colors.orange),
                     SizedBox(width: 6),
                     Text(
-                      "Status: $status",
+                      "Status: ${widget.status}",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: status == "Pending" ? Colors.red : Colors.green,
+                        color: widget.status == "Pending"
+                            ? Colors.red
+                            : Colors.green,
                         fontSize: 14,
                       ),
                     ),
@@ -373,7 +579,7 @@ class ViolationCard extends StatelessWidget {
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
                 Text(
-                  "$date $time",
+                  "${widget.date} ${widget.time}",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -393,7 +599,7 @@ class ViolationCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    type,
+                    widget.type,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.red[800],
@@ -415,7 +621,7 @@ class ViolationCard extends StatelessWidget {
                 ),
                 Expanded(
                   child: Text(
-                    location,
+                    widget.location,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -431,16 +637,18 @@ class ViolationCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      String check = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => ViolationDetailsScreen(
-                            violationhistory: violationhisrty,
-                            wardenid: w_id,
+                            violationhistory: widget.violationhisrty,
+                            wardenid: widget.w_id,
+                            nakaid: widget.naka_id,
                           ),
                         ),
                       );
+                      await widget.refreshData(widget.naka_id, widget.w_id);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.teal.shade700,
@@ -459,19 +667,20 @@ class ViolationCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 16), // spacing between buttons
-                if (status == "Pending")
+                if (widget.status != "Issue")
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
+                      onPressed: () async {
+                        bool? check = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => CreateChallanScreen(
-                              wardenId: w_id,
-                              violationhistory: violationhisrty,
+                              wardenId: widget.w_id,
+                              violationhistory: widget.violationhisrty,
                             ),
                           ),
                         );
+                        await widget.refreshData(widget.naka_id, widget.w_id);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal.shade900,

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:motorbikesafety/Service/ApiHandle.dart';
 
 class getimage extends StatefulWidget {
   const getimage({super.key});
@@ -16,6 +17,7 @@ class _getimageState extends State<getimage> {
   String? cnic1;
   String? email;
   String? mobile;
+  API a = new API();
 
   // Function to fetch image paths from the server
   Future<void> _fetchImages() async {
@@ -29,7 +31,7 @@ class _getimageState extends State<getimage> {
     }
 
     final url =
-        'http://127.0.0.1:4321/get-images/$cnic'; // Replace with your server URL
+        '${API.baseurl}/get-images/$cnic'; // Replace with your server URL
 
     try {
       final response = await http.get(Uri.parse(url));
@@ -119,7 +121,7 @@ class _getimageState extends State<getimage> {
               child: Text('Get Images'),
             ),
             SizedBox(height: 20),
-            name != null ? Text("name :${name}") : SizedBox(),
+            name != null ? Text("name :$name") : SizedBox(),
             SizedBox(height: 20),
             // Display fetched images
             _imageData.isNotEmpty
@@ -139,7 +141,7 @@ class _getimageState extends State<getimage> {
                             SizedBox(height: 10),
                             // Image display using the filepath returned by the server
                             Image.network(
-                              "http://127.0.0.1:4321/uploadsmulti/${item['img_path']}",
+                              "${API.baseurl}/uploadsmulti/${item['img_path']}",
                               width: 300,
                               height: 300,
                               fit: BoxFit.cover,

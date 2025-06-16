@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:motorbikesafety/Service/ApiHandle.dart';
 
 class MultiResponseScreen extends StatelessWidget {
   final dynamic responseData;
@@ -81,7 +81,7 @@ class MultiResponseScreen extends StatelessWidget {
                                 SizedBox(height: 10),
                                 // Image display using the filepath returned by the server
                                 Image.network(
-                                  "http://127.0.0.1:4321/uploadsmulti/${item['filename']}",
+                                  "${API.baseurl}/uploadsmulti/${item['filename']}",
                                   width: 300,
                                   height: 300,
                                   fit: BoxFit.cover,
